@@ -7,6 +7,7 @@ global msglen
 ; Linux specific code
 %ifdef LINUX
     section .text
+    ; Print text to stdout (message, message length)
     print:
         pop rbx
         mov rax, 1
@@ -16,21 +17,13 @@ global msglen
         syscall
         push rbx
         ret
-    ; Macro to print to terminal
-    ;%macro macro_print 2 
-    ;    mov rax, 1
-    ;    mov rdi, 1
-    ;    mov rsi, %1
-    ;    mov rdx, %2
-    ;    syscall
-    ;%endmacro
 
-    ; Exit with code
-    %macro macro_exit 1
+    ; Exit with code (exit code)
+    exit:
+        pop rbx
         mov rax, 60
-        mov rdi, %1
+        pop rdi
         syscall
-    %endmacro
 
 
 ; Windows specific code
@@ -50,4 +43,5 @@ _start:
     call print
     pop rbx
 
-    macro_exit 0
+    push 0x00  ; Exit code 0
+    call exit ; Call exit function

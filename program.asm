@@ -6,14 +6,24 @@ global msglen
 
 ; Linux specific code
 %ifdef LINUX
-    ; Macro to print to terminal
-    %macro macro_print 2 
+    section .text
+    print:
+        pop rbx
         mov rax, 1
         mov rdi, 1
-        mov rsi, %1
-        mov rdx, %2
+        pop rsi
+        pop rdx
         syscall
-   %endmacro
+        push rbx
+        ret
+    ; Macro to print to terminal
+    ;%macro macro_print 2 
+    ;    mov rax, 1
+    ;    mov rdi, 1
+    ;    mov rsi, %1
+    ;    mov rdx, %2
+    ;    syscall
+    ;%endmacro
 
     ; Exit with code
     %macro macro_exit 1
@@ -35,6 +45,9 @@ section .data
 
 section .text
 _start:
-    macro_print msg, msglen
+    push msglen
+    push msg
+    call print
+    pop rbx
 
     macro_exit 0

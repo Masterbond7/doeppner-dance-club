@@ -2,7 +2,7 @@ global _start
 global msg
 global msglen
 
-%define LINUX 1
+%define WINDOWS 1
 
 ; Linux specific code
 %ifdef LINUX

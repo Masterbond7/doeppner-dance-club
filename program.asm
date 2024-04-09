@@ -1,3 +1,12 @@
+bits 64
+
+; 'Global variables' to make things clearer
+EXIT equ 60
+READ equ 0
+STDIN equ 0
+WRITE equ 1
+STDOUT equ 1
+
 global _start
 global msg
 global msglen
@@ -6,8 +15,8 @@ section .text
 ; Print text to stdout (message, message length)
 print:
     pop rbx
-    mov rax, 1
-    mov rdi, 1
+    mov rax, WRITE
+    mov rdi, STDOUT
     mov rsi, rsp
     add rsp, 8
     pop rdx
@@ -18,7 +27,7 @@ print:
 ; Exit with code (exit code)
 exit:
     pop rbx
-    mov rax, 60
+    mov rax, EXIT
     pop rdi
     syscall
 

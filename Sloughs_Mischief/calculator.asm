@@ -1,7 +1,6 @@
 global _start
 
-extern MESSAGE
-extern MSG_LEN
+%include "./constants.asm"
 
 section .text
 _start:

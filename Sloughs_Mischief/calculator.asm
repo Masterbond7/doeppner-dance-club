@@ -18,7 +18,12 @@ _start:
     ; Convert input to a number
     push number
     push tbuffer
-    call conv_a2dec
+    call conv_a2int
+
+    mov  rax, [number]
+    imul rax, 2
+    add  rax, 0x30
+    mov  [number], rax
 
     ; Print stuff
     push number
@@ -30,8 +35,8 @@ _start:
     mov rdi, 0
     syscall
 
-; Convert ASCII to dec (*number, *char buffer)
-conv_a2dec:
+; Convert ASCII to int (*number, *char buffer)
+conv_a2int:
     ; Pop return address and store in r15
     pop r15
 

@@ -21,6 +21,11 @@ _start:
     call conv_a2int
     mov r12, [number]
 
+    ; Clear tbuffer
+    push tbuffer
+    push tbuffer_len
+    call clear_mem
+
     ; Get second input from user
     push tbuffer
     push tbuffer_len
@@ -30,6 +35,11 @@ _start:
     push number
     push tbuffer
     call conv_a2int
+
+    ; Clear tbuffer
+    push tbuffer
+    push tbuffer_len
+    call clear_mem
 
     ; Maths time!
     mov rax, r12
@@ -47,10 +57,50 @@ _start:
     push tbuffer_len
     call print
 
+    ; Clear tbuffer
+    push tbuffer
+    push tbuffer_len
+    call clear_mem
+
     ; Exit
     mov rax, 60
     mov rdi, 0
     syscall
+
+
+; Clear memory (*memory, length)
+clear_mem:
+    ; Pop return address and store in r15
+    pop r15
+
+    ; Pop arguments
+    pop r9 ; Pop length into r9
+    pop r8 ; Pop memory pointer into r8
+
+    ; Zero byte counter
+    xor r10, r10
+
+    ; Start loop
+    jmp .recursive
+
+    .recursive:
+        ; If byte counter = length, exit
+        cmp r10, r9 ; / Compare length and byte counter
+        je .exit    ; \ If equal, jump to .exit
+
+        ; Zero memory location
+        mov BYTE [r8+r10], 0x00
+
+        ; Increment byte counter
+        inc r10
+
+        ; Loop
+        jmp .recursive
+
+    .exit:
+        ; Return to program
+        push r15 ; Put return address back
+        ret      ; Return
 
 
 ; Convert int to ASCII (*number) returns on stack (len, string...)
@@ -66,7 +116,7 @@ conv_int2a:
     xor r10, r10
 
     ; Push newline to the stack
-    push 0x0A ; Push newline
+    push word 0x0A ; Push newline
     inc r10   ; Inc char counter
 
     ; Move 10d to r11 for division
@@ -81,7 +131,7 @@ conv_int2a:
 
         ; Convert num to char
         add rdx, 0x30 ; Add "0" to RDX (remainder)
-        push dx       ; Push charachter to the stack
+        push word dx       ; Push charachter to the stack
         inc r10       ; Inc char counter
 
         ; If quotient is 0, unstack the stack
@@ -100,7 +150,7 @@ conv_int2a:
     
     .unstack:
         ; Pop from stack into text buffer
-        pop ax           ; Pop char into AX
+        pop word ax           ; Pop char into AX
         mov [r8+r11], al ; Move first byte of AX to t_buffer
 
         ; Increase byte counter

@@ -11,35 +11,37 @@ section .text
 ; Main function
 _start:
     ; Get input from user
-    push tbuffer
-    push tbuffer_len
-    call get_input
+    push tbuffer     ; *char buffer
+    push tbuffer_len ; # chars
+    call get_input   ; Modifies [*char buffer]
 
     ; Convert input to a number
-    push number
-    push tbuffer
-    call conv_a2int
+    push number     ; *number
+    push tbuffer    ; *char buffer
+    call conv_a2int ; Modifies [*number]
     mov r12, [number]
 
     ; Clear tbuffer
-    push tbuffer
-    push tbuffer_len
-    call clear_mem
+    push tbuffer     ; *memory
+    push tbuffer_len ; length
+    call clear_mem   ; Modifies [*memory]
+
 
     ; Get second input from user
-    push tbuffer
-    push tbuffer_len
-    call get_input
+    push tbuffer     ; *char buffer
+    push tbuffer_len ; # chars
+    call get_input   ; Modifies [*char buffer]
 
     ; Convert second input to a number
-    push number
-    push tbuffer
-    call conv_a2int
+    push number     ; *number
+    push tbuffer    ; *char buffer
+    call conv_a2int ; Modifies [*number]
 
     ; Clear tbuffer
-    push tbuffer
-    push tbuffer_len
-    call clear_mem
+    push tbuffer     ; *memory
+    push tbuffer_len ; length
+    call clear_mem   ; Modifies [*memory]
+
 
     ; Maths time!
     mov rax, r12
@@ -47,20 +49,21 @@ _start:
     imul rax, r12
     mov  [number], rax
 
+
     ; Convert number to text
-    push tbuffer
-    push number
-    call conv_int2a
+    push tbuffer    ; *char buffer
+    push number     ; *number
+    call conv_int2a ; Modifies [*char buffer]
 
     ; Print stuff
-    push tbuffer
-    push tbuffer_len
-    call print
+    push tbuffer     ; *message
+    push tbuffer_len ; message length
+    call print       ; Prints to stdio
 
     ; Clear tbuffer
-    push tbuffer
-    push tbuffer_len
-    call clear_mem
+    push tbuffer     ; *memory
+    push tbuffer_len ; length
+    call clear_mem   ; Modifies [*memory]
 
     ; Exit
     mov rax, 60
@@ -103,7 +106,7 @@ clear_mem:
         ret      ; Return
 
 
-; Convert int to ASCII (*number) returns on stack (len, string...)
+; Convert int to ASCII (*char buffer, *number)
 conv_int2a:
     ; Pop return address and store in r15
     pop r15

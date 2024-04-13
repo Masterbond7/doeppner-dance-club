@@ -47,7 +47,6 @@ printNum:
 
 
 getInput:
-    ;pop r12
     ; Output prompt
     mov rax, SYS_WRITE
     mov rdi, STDOUT
@@ -63,41 +62,26 @@ getInput:
     syscall
 
     mov rax, 0          ; rax - Total number
-    mov rbx, 0          ; rbx - Index of current byte
+    mov r8, 0           ; rbx - Index of current byte
 .CheckByte:
-    mov rcx, input
-    add rcx, rbx        ; rcx - Memory address of next byte
+    mov r9, input
+    add r9, r8          ; r9 - Memory address of next byte
 
-    mov rdx, (rcx)      ; rdx - Number at memory address
-    cmp rdx, 0
+    mov r10b, [r9]       ; rdx - Number at memory address
+    cmp r10, 10
     je .CountComplete   ; If next byte is empty, string is ended
 
-    sub rdx, 48         ; Char to number
+    sub r10, 48         ; Char to number
     
-    mov r8, 10
-    mul r8              ; Multiply current num by 10
-    add rbx, rdx        ; Add last digit to current num
+    mov r11, 10
+    mul r11              ; Multiply current num by 10
+    add rax, r10         ; Add last digit to current num
+
+    add r8, 1
 
     jmp .CheckByte
 .CountComplete:
-
-    mov rax, SYS_WRITE
-    mov rdi, STDOUT
-    mov rsi, input
-    add rsi, 2
-    mov rdx, 1
-    syscall
-
-    mov rax, (rsi)
-    cmp rax, 0
-    je .CheckByte
-
-    ; Convert char to number
-    ;mov rax, [input]
-    ;sub rax, 48
-    ;push rax
-
-    ;push r12
+    mov r11, rax
     ret
 
 exit:

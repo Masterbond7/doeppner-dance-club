@@ -1,0 +1,15 @@
+%macro print 1
+    mov rax, 1 ; sys_write
+    mov rdi, 1 ; stdout
+
+    mov rdx, %%message_len
+    mov rsi, %%message
+
+    syscall
+    jmp %%over
+
+
+%%message: db %1 ; define bytes for string
+%%message_len: equ $ - %%message ; get length of string
+%%over:
+%endmacro

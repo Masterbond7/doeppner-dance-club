@@ -1,0 +1,12 @@
+# Ignore all
+*
+
+# Include files with extensions
+!*.* 
+
+# Include dirs
+!*/
+
+# Ignore compiled outputs
+*.o
+*.elf

@@ -24,56 +24,60 @@ STDOUT equ 1
 section .text
 
 _start:
-    ; move 14 to lower half of ax
-    mov al, 14
-    mov ah, 0
+    mov ax, 128d
+    mov r11, 10d ; set as 10 for division
+    xor r12, r12 ; set digit counter to 0
 
-    ; set number to divide by
-    mov bl, 10
+    .stack:
+        xor dx, dx ; reset remainder register
+        div r11 ; divide the quotient by 10
 
-    ; divide by 10, leaving the quotient in al and the remainder in ah
-    div bl
+        add dx, 48 ; convert to ascii
+        push dx ; push ascii value
+        sub dx, 48 ; convert back to ascii
 
-    ; acsii to int
-    add al, 48
-    add ah, 48
+        add r12, 1 ; add to digit counter value
 
-    ; push digits to stack
-    sub rsp, 1
-    mov byte [rsp], ah
+        cmp ax, 0d ; check if quotient is 0
+        jne .stack ; if quotient = 0, jump to .stack
 
-    sub rsp, 1
-    mov byte [rsp], al
+    .unstack:
+        ; printing
+        mov rax, SYS_WRITE
+        mov rdi, STDOUT
 
-    ; print
-    mov rax, SYS_WRITE
-    mov rdi, STDOUT
+        mov rdx, 1
+        mov rsi, rsp
 
-    mov rdx, 2
-    mov rsi, rsp
+        syscall
 
-    ; move pointer back
-    add rsp, 2
-    
-    syscall
+        add rsp, 2
 
-
-
-
-
-    
-    ;     remainder   quotient
-    ; ax: 00000100    00000001
-
-    ; move ax to cx
-    ; clear upper so only quotient: 00000000 00000001
-    ; print cx
-
-    ; move ax to cx
-    ; clear lower and shift right so only remainder: 00000000 00000100
-    ; print cx
+        sub r12, 1
+        cmp r12, 0d
+        jne .unstack
 
     ; Exit
     xor edi, edi ; valid exit code
     mov rax, SYS_EXIT
     syscall
+    
+
+
+; to print number
+
+; divide by 10
+
+; push remainder to stack
+; if quotient < 10, push to stack
+; else, divide again
+
+; once done, flip order of things in stack cause
+; things will be the wrong away around
+
+
+
+; 
+
+
+; 821

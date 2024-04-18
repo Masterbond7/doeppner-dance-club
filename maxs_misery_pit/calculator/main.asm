@@ -29,53 +29,19 @@ section .bss
 section .text
 
 _start:
-    print "Enter number: "
+    print "Enter number 1: "
+    call get_input
+
+    print "Enter number 2: "
+    call get_input
 
     ;
-    ; get input
+    ; maths!!!!
     ;
-    mov rax, SYS_READ
-    mov rdi, STDIN
-    
-    mov rsi, input
-    mov rdx, input_len
-
-    syscall
-
-    ;
-    ; ascii to int
-    ;
-    mov r12, input_len ; loop counter
-    mov r13, 1 ; power
-
-    xor r11, r11 ; total value
-
-    .iterate:
-        sub r12, 1d ; decrease loop counter
-
-        movzx rax, byte[input+r12] ; access specfied byte of the input buffer
-
-        cmp rax, 48 ; check if ascii value is below 48 (for whitespace proofing)
-        jb .iterate ; if so, jump back to iterate
-
-        sub rax, 48 ; convert to int
-
-        imul rax, r13 ; multiply by the current power of 10
-        imul r13, 10 ; increase the power of 10
-
-        add r11, rax ; add the value of the digit to the total value
-
-        ; iterating
-        cmp r12, 0d
-        jne .iterate
-
-    
-    add r11, 1 ; add 1 to input number to prove it converts properly
-
-    push r11 ; push total int value of input to stack
-
-
-    print "Your number plus 1 equals: "
+    pop rax
+    pop rbx
+    add rax, rbx
+    push rax
 
     ;
     ; int to ascii
@@ -122,3 +88,53 @@ _start:
     xor edi, edi ; valid exit code
     mov rax, SYS_EXIT
     syscall
+
+
+    ;
+    ; get input
+    ; 
+    get_input:
+        pop r15
+
+        ;
+        ; get input
+        ;
+        mov rax, SYS_READ
+        mov rdi, STDIN
+        
+        mov rsi, input
+        mov rdx, input_len
+
+        syscall
+
+        ;
+        ; ascii to int
+        ;
+        mov r12, input_len ; loop counter
+        mov r13, 1 ; power
+
+        xor r11, r11 ; total value
+
+        .iterate:
+            sub r12, 1d ; decrease loop counter
+
+            movzx rax, byte[input+r12] ; access specfied byte of the input buffer
+
+            cmp rax, 48 ; check if ascii value is below 48 (for whitespace proofing)
+            jb .iterate ; if so, jump back to iterate
+
+            sub rax, 48 ; convert to int
+
+            imul rax, r13 ; multiply by the current power of 10
+            imul r13, 10 ; increase the power of 10
+
+            add r11, rax ; add the value of the digit to the total value
+
+            ; iterating
+            cmp r12, 0d
+            jne .iterate
+
+        push r11 ; push total int value of input to stack
+
+        push r15
+        ret

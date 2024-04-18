@@ -23,14 +23,12 @@ STDOUT equ 1
 
 
 section .bss
-    input_len equ 1 ; 1 byte for user input
+    input_len equ 2 ; 2 bytes for user input
     input resb input_len ; buffer for user input
 
 section .text
 
 _start:
-
-
     print "Enter number: "
 
     ;
@@ -44,27 +42,38 @@ _start:
 
     syscall
 
-
-    
-    xor r12, r12 ; loop counter
+    ;
+    ; ascii to int
+    ;
+    xor r12, input_len ; loop counter
+    mov r13, 1 ; power
 
     xor r11, r11 ; total value
 
     .iterate:
+        sub r12, 1d ; decrease loop counter
 
-        mov r10, [input]
+        movzx rax, byte[input+r12] ; access specfied byte of the input buffer
 
-        sub r10, 48
-        add r11, r10
+        sub rax, 48 ; convert to int
+        imul rax, r13 ; multiply by the current power of 10
+        
+        imul r13, 10 ; increase the power of 10
+
+        add r11, rax ; add the value of the digit to the total value
 
 
         ; iterating
-        add r12, 1d
-        cmp r12, 1d
+        cmp r12, 0d
         jne .iterate
 
+    
+    add r11, 1 ; add 1 to input number to prove it converts properly
 
-    push r11
+    push r11 ; push total int value of input to stack
+
+
+    print "Your number plus 1 equals: "
 
     ;
     ; int to ascii
@@ -102,6 +111,8 @@ _start:
         sub r12, 1 ; decrease digit counter
         cmp r12, 0d ; check if digit counter is zero
         jne .unstack ; if digit counter != 0, jump to .unstack
+
+    print 10
 
     ; Exit
     xor edi, edi ; valid exit code

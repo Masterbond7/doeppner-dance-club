@@ -45,7 +45,7 @@ _start:
     ;
     ; ascii to int
     ;
-    xor r12, input_len ; loop counter
+    mov r12, input_len ; loop counter
     mov r13, 1 ; power
 
     xor r11, r11 ; total value

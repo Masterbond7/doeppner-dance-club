@@ -29,11 +29,17 @@ section .bss
 section .text
 
 _start:
+    print "Add 2 numbers!"
+    print 10
+    print 10
+
     print "Enter number 1: "
     call get_input
 
     print "Enter number 2: "
     call get_input
+
+    print " = "
 
     ;
     ; maths!!!!

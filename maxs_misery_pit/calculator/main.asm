@@ -23,7 +23,7 @@ STDOUT equ 1
 
 
 section .bss
-    input_len equ 2 ; 2 bytes for user input
+    input_len equ 8 ; 2 bytes for user input
     input resb input_len ; buffer for user input
 
 section .text
@@ -55,13 +55,15 @@ _start:
 
         movzx rax, byte[input+r12] ; access specfied byte of the input buffer
 
+        cmp rax, 48 ; check if ascii value is below 48 (for whitespace proofing)
+        jb .iterate ; if so, jump back to iterate
+
         sub rax, 48 ; convert to int
+
         imul rax, r13 ; multiply by the current power of 10
-        
         imul r13, 10 ; increase the power of 10
 
         add r11, rax ; add the value of the digit to the total value
-
 
         ; iterating
         cmp r12, 0d
@@ -114,7 +116,9 @@ _start:
 
     print 10
 
+    ;
     ; Exit
+    ;
     xor edi, edi ; valid exit code
     mov rax, SYS_EXIT
     syscall

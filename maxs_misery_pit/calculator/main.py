@@ -1,3 +1,6 @@
-num = int(input("Enter number: "))
-num += 1
-print("Your number plus 1 equals", num)
+num1 = int(input("Enter number 1: "))
+num2 = int(input("Enter number 2: "))
+
+sum = num1 + num2
+
+print(" =", sum)

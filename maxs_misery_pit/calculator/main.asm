@@ -86,13 +86,7 @@ _start:
             sub r9, 1d
             jne .recursive
 
-    cmp r13, 1d ; check if add is queued
-    jne .adda ; if not equall, skip
-        add r12, r11
-        xor r11, r11
-        xor r13, r13
-        mov r10, 1
-    .adda:
+    call maths
     
 
     push r12
@@ -154,17 +148,10 @@ _start:
     ;
     .operator:
 
-        cmp rax, 43d
-        jne .iterate
+        cmp rax, 40d
+        jb .iterate
 
-        cmp r13, 1d ; check if add is queued
-        jne .add ; if not equall, skip
-            add r12, r11
-            xor r11, r11
-            xor r13, r13
-            mov r10, 1
-        .add:
-
+        call maths
 
         cmp rax, 43d ; check if character is '+'
         jne .q_add ; if not equall, skip
@@ -178,3 +165,27 @@ _start:
         
 
         jmp .iterate
+
+
+maths:
+    pop r15
+
+    cmp r13, 1d ; check if add is queued
+    jne .add ; if not equall, skip
+        add r12, r11
+        xor r11, r11
+        xor r13, r13
+        mov r10, 1
+    .add:
+
+    cmp r13, 3d ; check if multiply is queued
+    jne .mul ; if not equall, skip
+        imul r12, r11
+        xor r11, r11
+        xor r13, r13
+        mov r10, 1
+    .mul:
+
+
+    push r15
+    ret

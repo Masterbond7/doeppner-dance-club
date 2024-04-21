@@ -63,8 +63,8 @@ _start:
 
     .recursive:
         sub r9, 1d ; decrease loop counter
-
         movzx rax, byte[input+r9] ; access specfied byte of the input buffer
+        add r9, 1d
 
         ; if not a digit, jump to operator
         cmp rax, 48d ; check if < '0'
@@ -83,14 +83,17 @@ _start:
 
         .iterate:
             cmp r9, 0d
+            sub r9, 1d
             jne .recursive
 
     cmp r13, 1d ; check if add is queued
     jne .adda ; if not equall, skip
         add r12, r11
+        xor r11, r11
         xor r13, r13
         mov r10, 1
     .adda:
+    
 
     push r12
 
@@ -157,6 +160,7 @@ _start:
         cmp r13, 1d ; check if add is queued
         jne .add ; if not equall, skip
             add r12, r11
+            xor r11, r11
             xor r13, r13
             mov r10, 1
         .add:

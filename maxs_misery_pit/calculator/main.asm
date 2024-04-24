@@ -23,9 +23,8 @@ STDOUT equ 1
 
 
 section .bss
-    input_len equ 8 ; 2 bytes for user input
+    input_len equ 8 ; 8 bytes for user input
     input resb input_len ; buffer for user input
-
 section .text
 
 _start:
@@ -50,30 +49,26 @@ _start:
     ;
     ; Ascii to int
     ;
+
+    ; Get all numbers and store them
     mov r9, input_len ; loop counter
-    mov r10, 1 ; power of 10
+    
+    .numbers_start:
+        mov r10, 1 ; power
+        xor r11, r11 ; current number
 
-    xor r11, r11 ; current number value
-    xor r12, r12 ; total value
-
-    mov r13, 1 ; queued operation
-    ; 1 = add
-    ; 3 = mult
-
-
-    .recursive:
+    .numbers_loop:
         sub r9, 1d ; decrease loop counter
         movzx rax, byte[input+r9] ; access specfied byte of the input buffer
-        add r9, 1d
 
         ; if not a digit, jump to operator
         cmp rax, 48d ; check if < '0'
-        jb .operator ; if so, jump to .operator
+        jb .next_num ; if so, jump to .next_num
 
         cmp rax, 57d ; check if > '0'
-        jg .operator ; if so, jump to .operator
+        jg .next_num ; if so, jump to .next_num
 
-
+        ; else
         sub rax, 48 ; convert to int
 
         imul rax, r10 ; multiply by the current power of 10
@@ -81,15 +76,32 @@ _start:
 
         add r11, rax ; add the value of the digit to the total value
 
-        .iterate:
-            cmp r9, 0d
-            sub r9, 1d
-            jne .recursive
-
-    call maths
+        cmp rax, 0d
+        jne .numbers_loop
     
+    .next_num:
+        push r11
 
-    push r12
+        cmp rax, 0d
+        jne .numbers_start
+
+
+
+    mov r9, 8
+    xor r10, r10
+
+    .add_all:
+        pop r11
+        add r10, r11
+        
+        cmp r9, 0d
+        sub r9, 1
+        jne .add_all
+
+    push r10
+
+
+
 
 
 
@@ -138,54 +150,3 @@ _start:
     xor edi, edi ; valid exit code
     mov rax, SYS_EXIT
     syscall
-
-
-
-
-
-    ;
-    ; meow
-    ;
-    .operator:
-
-        cmp rax, 40d
-        jb .iterate
-
-        call maths
-
-        cmp rax, 43d ; check if character is '+'
-        jne .q_add ; if not equall, skip
-            mov r13, 1d
-        .q_add:
-
-        cmp rax, 42d ; check if character is '*'
-        jne .q_mul ; if not equall, skip
-            mov r13, 3d
-        .q_mul:
-        
-
-        jmp .iterate
-
-
-maths:
-    pop r15
-
-    cmp r13, 1d ; check if add is queued
-    jne .add ; if not equall, skip
-        add r12, r11
-        xor r11, r11
-        xor r13, r13
-        mov r10, 1
-    .add:
-
-    cmp r13, 3d ; check if multiply is queued
-    jne .mul ; if not equall, skip
-        imul r12, r11
-        xor r11, r11
-        xor r13, r13
-        mov r10, 1
-    .mul:
-
-
-    push r15
-    ret

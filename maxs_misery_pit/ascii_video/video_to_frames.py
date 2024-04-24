@@ -1,9 +1,16 @@
+import os
 import cv2
-vidcap = cv2.VideoCapture('big_buck_bunny_720p_5mb.mp4')
+
+if not os.path.isdir("frames"):
+  os.mkdir("frames")
+
+file = input("Filename: ")
+
+vidcap = cv2.VideoCapture("videos/{}".format(file))
 success,image = vidcap.read()
 count = 0
 while success:
-  cv2.imwrite("frame%d.jpg" % count, image)     # save frame as JPEG file      
+  cv2.imwrite("frames/%d.jpg" % count, image)     # save frame as JPEG file      
   success,image = vidcap.read()
-  print('Read a new frame: ', success)
+  print("Read a new frame: ", success)
   count += 1

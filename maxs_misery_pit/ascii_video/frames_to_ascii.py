@@ -23,6 +23,12 @@ def sort_nicely(l):
 
 if not os.path.isdir("ascii_frames"):
   os.mkdir("ascii_frames")
+else:
+    frames_to_clear = os.listdir("ascii_frames")
+
+    for frame in frames_to_clear:
+        os.remove("ascii_frames/{}".format(frame))
+
 
 frames = os.listdir('frames')
 sort_nicely(frames)
@@ -54,7 +60,9 @@ for frame in frames:
         green = pixel[1] * 0.7152
         blue = pixel[2] * 0.0722
 
-        brightness = int(red + green + blue)
+        brightness = int(round(red + green + blue))
+
+        print("Brightness:", brightness)
 
         if brightness < lowest_brightness:
             lowest_brightness = brightness
@@ -64,13 +72,24 @@ for frame in frames:
 
         brightness_vals.append(brightness)
 
-    # Shift range down to lowest value of 0
-    highest_brightness -= lowest_brightness
-    lowest_brightness = 0
+    print("Highest brightness:", highest_brightness)
+    print("Lowest brightness:",lowest_brightness)
 
-    range_divider = 255/(255 / highest_brightness)
+    if highest_brightness == 0:
+        lowest_brightness = 0
+        range_divider = 0
+        brightness_multiplier = 0
+    else:
+        # Shift range down to lowest value of 0
+        highest_brightness -= lowest_brightness
+        lowest_brightness = 0  
 
-    brightness_multiplier = ( 70/(255/( 255/highest_brightness )) )
+        brightness_multiplier = 70/highest_brightness
+        print("Brightness multiplier: ", brightness_multiplier)
+
+    print("Highest brightness after:", highest_brightness)
+    print("Lowest brightness after:",lowest_brightness)
+
 
     pos = 0
 
@@ -79,9 +98,10 @@ for frame in frames:
     for y in range(int(height/2)):
         line = ""
         for x in range(width):
-            char = int(brightness_multiplier * brightness_vals[pos])
+            char = int(round(brightness_multiplier * brightness_vals[pos]))
             pos += 1
 
+            #print(char)
             line += chars[char]
 
         pos += width
@@ -91,5 +111,5 @@ for frame in frames:
         frame_file.write(line)
         
     
-    print("Frame {}".format(frame_num))
+    print("Frame {}/{}".format(frame_num+1, len(frames)))
     frame_num += 1

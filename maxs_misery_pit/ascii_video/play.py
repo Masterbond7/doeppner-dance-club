@@ -36,9 +36,11 @@ for frame in frames:
     
     frame_file.close()
 
-for frame in frame_list:
-    os.system("clear")
 
-    print(frame)
+while True:
+    for frame in frame_list:
+        os.system("clear")
 
-    time.sleep(.033)
+        print(frame)
+
+        time.sleep(.033)

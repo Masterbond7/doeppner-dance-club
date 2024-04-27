@@ -53,18 +53,26 @@ frame_num = 0
 
 frames_len = len(frames)
 
+video_file = open("ascii_frames/hehehehaw.asv", "ab")
+
+# open frame and get its dimensions
+im = Image.open("frames/0.jpg", 'r')
+width, height = im.size
+
+width_bytes = width.to_bytes(2, "little")
+height_bytes = height.to_bytes(2, "little")
+
+video_file.write(width_bytes)
+video_file.write(height_bytes)
+
 for frame in frames:
     print("Frame {}/{}".format(frame_num+1, frames_len))
 
-    # reset frame
-    frame_chars = []
+    # open frame and get its dimensions
+    im = Image.open("frames/{}".format(frame), 'r')
 
     # reset brightness values
     brightness_vals = []
-
-    # open frame and get its dimensions
-    im = Image.open("frames/{}".format(frame), 'r')
-    width, height = im.size
 
     # return list of an rgb value for each pixel
     rgb_vals = list(im.getdata()) 
@@ -121,22 +129,17 @@ for frame in frames:
     #
     # Brightness value to ascii
     #
-    frame_file = open("ascii_frames/frame{}".format(frame_num), "a")
 
     pos = 0
 
-    for y in range( math.floor(height/2) ):
-        line = ""
-        for x in range(width):
-            char = round( brightness_multiplier*brightness_vals[pos] ) 
+    for y in range( math.floor(height/2)*width ):
+        char = round( brightness_multiplier*brightness_vals[pos] ) 
+        byte = chars[char].encode()
 
-            line += chars[char]
+        video_file.write(byte)
 
-            pos += 1
+        pos += 1
 
-        line += "\n"
-
-        frame_file.write(line)
     
-    frame_file.close()
     frame_num += 1
+video_file.close()

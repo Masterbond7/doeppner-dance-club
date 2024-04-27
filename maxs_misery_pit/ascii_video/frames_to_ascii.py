@@ -1,8 +1,11 @@
 from PIL import Image
 import os
-
 import re
+import math
 
+#
+# Sorting frames
+#
 def tryint(s):
     try:
         return int(s)
@@ -34,35 +37,63 @@ frames = os.listdir('frames')
 sort_nicely(frames)
 
 
+#
+# Setting character string
+#
 chars_string = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@"
 chars = []
 
 for char in chars_string:
     chars.append(char)
 
-
+#
+# Frame iteration
+#
 frame_num = 0
 
+frames_len = len(frames)
+
 for frame in frames:
+    print("Frame {}/{}".format(frame_num+1, frames_len))
+
+    # reset frame
     frame_chars = []
 
+    # reset brightness values
+    brightness_vals = []
+
+    # open frame and get its dimensions
     im = Image.open("frames/{}".format(frame), 'r')
     width, height = im.size
 
-    rgb_vals = list(im.getdata())
-    brightness_vals = []
+    # return list of an rgb value for each pixel
+    rgb_vals = list(im.getdata()) 
 
-    lowest_brightness = 255
+    #
+    # remove every second line from rgb_vals
+    #
+    skip = 0
+
+    for y in range( math.floor(height/2) ):
+        skip += width # to skip a line
+
+        for x in range(width): # iterate over entire line
+            rgb_vals.pop(skip)
+        
+        
+    lowest_brightness = 254
     highest_brightness = 0
 
+    #
+    # convert each rgb value into a brightness value
+    #
     for pixel in rgb_vals:
+        # funny maths to convert rgb --> brightness
         red = pixel[0] * 0.2126
         green = pixel[1] * 0.7152
         blue = pixel[2] * 0.0722
 
-        brightness = int(round(red + green + blue))
-
-        print("Brightness:", brightness)
+        brightness = round(red + green + blue)
 
         if brightness < lowest_brightness:
             lowest_brightness = brightness
@@ -72,44 +103,40 @@ for frame in frames:
 
         brightness_vals.append(brightness)
 
-    print("Highest brightness:", highest_brightness)
-    print("Lowest brightness:",lowest_brightness)
+    # set the shifted brightness values. e.g. a range of 10-50 becomes 0-40
+    shifted_lowest_brightness = 0
+    shifted_highest_brightness = highest_brightness - lowest_brightness
 
-    if highest_brightness == 0:
-        lowest_brightness = 0
-        range_divider = 0
+
+    if shifted_highest_brightness == 0:
         brightness_multiplier = 0
     else:
-        # Shift range down to lowest value of 0
-        highest_brightness -= lowest_brightness
-        lowest_brightness = 0  
+        # shift all the brightness values
+        for i in range(len(brightness_vals)):
+            brightness_vals[i] -= lowest_brightness
 
-        brightness_multiplier = 70/highest_brightness
-        print("Brightness multiplier: ", brightness_multiplier)
+        brightness_multiplier = (len(chars)-1)/shifted_highest_brightness
 
-    print("Highest brightness after:", highest_brightness)
-    print("Lowest brightness after:",lowest_brightness)
 
+    #
+    # Brightness value to ascii
+    #
+    frame_file = open("ascii_frames/frame{}".format(frame_num), "a")
 
     pos = 0
 
-    frame_file = open("ascii_frames/frame{}".format(frame_num), "a")
-
-    for y in range(int(height/2)):
+    for y in range( math.floor(height/2) ):
         line = ""
         for x in range(width):
-            char = int(round(brightness_multiplier * brightness_vals[pos]))
-            pos += 1
+            char = round( brightness_multiplier*brightness_vals[pos] ) 
 
-            #print(char)
             line += chars[char]
 
-        pos += width
-        
+            pos += 1
+
         line += "\n"
 
         frame_file.write(line)
-        
     
-    print("Frame {}/{}".format(frame_num+1, len(frames)))
+    frame_file.close()
     frame_num += 1

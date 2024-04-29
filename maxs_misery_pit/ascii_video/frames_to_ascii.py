@@ -3,6 +3,13 @@ import os
 import re
 import math
 
+new_line = "\n".encode('utf-8')
+
+tab = 9
+tab_bytes = tab.to_bytes(1, "little")
+
+home = b'\x1b[H'
+
 #
 # Sorting frames
 #
@@ -59,11 +66,13 @@ video_file = open("ascii_frames/hehehehaw.asv", "ab")
 im = Image.open("frames/0.jpg", 'r')
 width, height = im.size
 
-width_bytes = width.to_bytes(2, "little")
-height_bytes = height.to_bytes(2, "little")
+"""
+width_bytes = width.to_bytes(1, "little")
+height_bytes = height.to_bytes(1, "little")
 
 video_file.write(width_bytes)
 video_file.write(height_bytes)
+"""
 
 for frame in frames:
     print("Frame {}/{}".format(frame_num+1, frames_len))
@@ -132,14 +141,17 @@ for frame in frames:
 
     pos = 0
 
-    for y in range( math.floor(height/2)*width ):
-        char = round( brightness_multiplier*brightness_vals[pos] ) 
-        byte = chars[char].encode()
+    for y in range( math.floor(height/2)):
+        for x in range(width):
+            char = round( brightness_multiplier*brightness_vals[pos] ) 
+            byte = chars[char].encode()
 
-        video_file.write(byte)
+            video_file.write(byte)
 
-        pos += 1
+            pos += 1
+        
+        video_file.write(new_line)
 
-    
+    video_file.write(home)
     frame_num += 1
 video_file.close()

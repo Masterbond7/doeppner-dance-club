@@ -2,6 +2,12 @@ global _start
 
 section .data
     tbuffer_len equ 21 ; # chars for text buffer
+    string_fnum db "Please enter the first number: "
+    string_fnum_len equ $ - string_fnum
+    string_snum db "Please enter the second number: "
+    string_snum_len equ $ - string_snum
+    string_ans db "The result is: "
+    string_ans_len equ $ - string_ans
 
 section .bss
     tbuffer resb tbuffer_len ; Buffer for text input
@@ -10,6 +16,12 @@ section .bss
 section .text
 ; Main function
 _start:
+    ; Get first number
+    ; Print string_fnum
+    push string_fnum     ; *message
+    push string_fnum_len ; message length
+    call print           ; Prints to stdio
+
     ; Get input from user
     push tbuffer     ; *char buffer
     push tbuffer_len ; # chars
@@ -19,13 +31,19 @@ _start:
     push number     ; *number
     push tbuffer    ; *char buffer
     call conv_a2int ; Modifies [*number]
-    mov r12, [number]
+    mov r12, [number] ; Store num in r12
 
     ; Clear tbuffer
     push tbuffer     ; *memory
     push tbuffer_len ; length
     call clear_mem   ; Modifies [*memory]
 
+
+    ; Get second number from the user
+    ; Print string_snum
+    push string_snum     ; *message
+    push string_snum_len ; message length
+    call print           ; Prints to stdio
 
     ; Get second input from user
     push tbuffer     ; *char buffer
@@ -55,7 +73,12 @@ _start:
     push number     ; *number
     call conv_int2a ; Modifies [*char buffer]
 
-    ; Print stuff
+    ; Print string_ans
+    push string_ans     ; *message
+    push string_ans_len ; message length
+    call print          ; Prints to stdio
+
+    ; Print answer
     push tbuffer     ; *message
     push tbuffer_len ; message length
     call print       ; Prints to stdio

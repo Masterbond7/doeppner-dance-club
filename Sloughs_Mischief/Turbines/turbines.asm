@@ -1,5 +1,6 @@
 global _start
 
+; Data!
 section .data
     text db "Hello World!", 0x0A
     text_len equ $ - text
